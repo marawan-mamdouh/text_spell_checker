@@ -1,4 +1,7 @@
-import PyPDF2, docx, re, difflib
+import PyPDF2
+import difflib
+import docx
+import re
 
 
 def hasNumbers(inputString):
@@ -11,7 +14,7 @@ def readDictionaryFile(fileName):
     for line in file:
         lineWords = line.strip().split()
         for word in lineWords:
-            dictionary.append(word)
+            dictionary.append(word.lower())
     file.close()
     return dictionary
 
@@ -66,26 +69,55 @@ def findErrors(dictionaryList, textlist):
     return list(set(misspellings))
 
 
-def printErrors(errorList):
-    pass
-
-
-def x(errorList, dictionary):
+def suggest(errorList, dictionary):
     for word in errorList:
         suggestion = difflib.get_close_matches(word, dictionary)
-        print(f"- Did you mean {', ' .join(str(x) for x in suggestion)} instead of {word}?")
+        print(f"- Did you mean {', '.join(str(x) for x in suggestion)} instead of {word}?")
 
 
-# errorList = findErrors(readDictionaryFile("dictionary.txt"), readTextFile("tt.docx"))
-# print(errorList)
-# x(errorList, readDictionaryFile("dictionary.txt"))
-print("Welcome to the spell checker")
-print()
-dictionaryFile = input("Please enter the dictionary file :")
-textFile = input("Please enter the text file :")
-dictionaryList = readDictionaryFile(dictionaryFile.strip())
-textlist = readTextFile(textFile.strip())
-errorList = findErrors(dictionaryList, textlist)
-print("errorList -> ", errorList)
-x(errorList, dictionaryList)
-# printErrors(errorList)
+print('''
+╔╗╔╗╔╗──╔╗──────────────╔╗─────╔╗╔╗──────────────╔╗╔╗────╔╗───────╔╗
+║║║║║║──║║─────────────╔╝╚╗───╔╝╚╣║──────────────║║║║────║║───────║║
+║║║║║╠══╣║╔══╦══╦╗╔╦══╗╚╗╔╬══╗╚╗╔╣╚═╦══╗╔══╦══╦══╣║║║─╔══╣╚═╦══╦══╣║╔╦══╦═╗
+║╚╝╚╝║║═╣║║╔═╣╔╗║╚╝║║═╣─║║║╔╗║─║║║╔╗║║═╣║══╣╔╗║║═╣║║║─║╔═╣╔╗║║═╣╔═╣╚╝╣║═╣╔╝
+╚╗╔╗╔╣║═╣╚╣╚═╣╚╝║║║║║═╣─║╚╣╚╝║─║╚╣║║║║═╣╠══║╚╝║║═╣╚╣╚╗║╚═╣║║║║═╣╚═╣╔╗╣║═╣║
+─╚╝╚╝╚══╩═╩══╩══╩╩╩╩══╝─╚═╩══╝─╚═╩╝╚╩══╝╚══╣╔═╩══╩═╩═╝╚══╩╝╚╩══╩══╩╝╚╩══╩╝
+───────────────────────────────────────────║║
+───────────────────────────────────────────╚╝
+''')
+inputType = input("Enter (1) to check file or Enter (2) to write some words to check : ")
+if inputType == "1":
+    dictionaryFile = input("Please enter the dictionary file : ")
+    textFile = input("Please enter the text file : ")
+    dictionaryList = readDictionaryFile(dictionaryFile.strip())
+    textlist = readTextFile(textFile.strip())
+    errorList = findErrors(dictionaryList, textlist)
+    print("errorList -> ", errorList)
+    suggest(errorList, dictionaryList)
+elif inputType == "2":
+    words = []
+    dictionaryList = readDictionaryFile("dictionary.txt".strip())
+    text = input("write text to check : \n")
+    for line in text.split():
+        line = re.sub('[^A-Za-z-]+', ' ', line)
+        lineWords = line.strip().split()
+        for word in lineWords:
+            word = word.lower()
+            if word != "" and not hasNumbers(word):
+                words.append(word)
+    errorList = findErrors(dictionaryList, list(set(words)))
+    if not errorList:
+        print("There is No Errors (^‿^)\n")
+    else:
+        print("errorList -> ", errorList)
+        suggest(errorList, dictionaryList)
+
+    print('''┏━━━━┓┏┓━━━━━━━━━━━┏┓━━━━━━━━━━━┏━┓━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┏┓━┏┓━━━━━━━━━━━━━━━━━━━━━━┏┓━┏┓━━━━━━━━━┏┓━━━━━━━━━━┏┓━━━━━━━━━
+┃┏┓┏┓┃┃┃━━━━━━━━━━━┃┃━━━━━━━━━━━┃┏┛━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┏┛┗┓┃┃━━━━━━━━━━━━━━━━━━━━━━┃┃━┃┃━━━━━━━━━┃┃━━━━━━━━━━┃┃━━━━━━━━━
+┗┛┃┃┗┛┃┗━┓┏━━┓━┏━┓━┃┃┏┓┏━━┓━━━━┏┛┗┓┏━━┓┏━┓━━━━┏┓┏┓┏━━┓┏┓┏━┓━┏━━┓━━━━┗┓┏┛┃┗━┓┏━━┓━━━━┏━━┓┏━━┓┏━━┓┃┃━┃┃━━━━━┏━━┓┃┗━┓┏━━┓┏━━┓┃┃┏┓┏━━┓┏━┓
+━━┃┃━━┃┏┓┃┗━┓┃━┃┏┓┓┃┗┛┛┃━━┫━━━━┗┓┏┛┃┏┓┃┃┏┛━━━━┃┃┃┃┃━━┫┣┫┃┏┓┓┃┏┓┃━━━━━┃┃━┃┏┓┃┃┏┓┃━━━━┃━━┫┃┏┓┃┃┏┓┃┃┃━┃┃━━━━━┃┏━┛┃┏┓┃┃┏┓┃┃┏━┛┃┗┛┛┃┏┓┃┃┏┛
+━┏┛┗┓━┃┃┃┃┃┗┛┗┓┃┃┃┃┃┏┓┓┣━━┃━━━━━┃┃━┃┗┛┃┃┃━━━━━┃┗┛┃┣━━┃┃┃┃┃┃┃┃┗┛┃━━━━━┃┗┓┃┃┃┃┃┃━┫━━━━┣━━┃┃┗┛┃┃┃━┫┃┗┓┃┗┓━━━━┃┗━┓┃┃┃┃┃┃━┫┃┗━┓┃┏┓┓┃┃━┫┃┃━
+━┗━━┛━┗┛┗┛┗━━━┛┗┛┗┛┗┛┗┛┗━━┛━━━━━┗┛━┗━━┛┗┛━━━━━┗━━┛┗━━┛┗┛┗┛┗┛┗━┓┃━━━━━┗━┛┗┛┗┛┗━━┛━━━━┗━━┛┃┏━┛┗━━┛┗━┛┗━┛━━━━┗━━┛┗┛┗┛┗━━┛┗━━┛┗┛┗┛┗━━┛┗┛━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┏━┛┃━━━━━━━━━━━━━━━━━━━━━━━━┃┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┗━━┛━━━━━━━━━━━━━━━━━━━━━━━━┗┛━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+''')
