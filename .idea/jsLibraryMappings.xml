@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="PROJECT" libraries="{python_docx-0.8.11-py3.9.egg-info, site-packages}" />
+    <excludedPredefinedLibrary name="HTML" />
+  </component>
+</project>
