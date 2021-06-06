@@ -45,7 +45,7 @@ def readTextFile(fileName):
         fullText = ""
         for para in docObject.paragraphs:
             fullText += " " + para.text
-            listWords(fullText)
+        listWords(fullText)
     elif extension[-1] == "txt":
         file = open(fileName, "r")
         for line in file:
@@ -95,11 +95,11 @@ while 1:
                 break
             else:
                 print("\nError Enter (.txt, .pdf or .docx) file")
-        dictionaryWordsList = readDictionaryFile(dictionaryFileName.strip())
-        inputTextList = readTextFile(textFileName.strip())
+        dictionaryWordsList = readDictionaryFile(dictionaryFileName)
+        inputTextList = readTextFile(textFileName)
         misspellings = findErrors(dictionaryWordsList, inputTextList)
     elif inputType == "2":
-        dictionaryWordsList = readDictionaryFile("dictionary.txt".strip())
+        dictionaryWordsList = readDictionaryFile("dictionary.txt")
         text = input("write text to check : \n")
         listWords(text)
         misspellings = findErrors(dictionaryWordsList, list(set(words)))
